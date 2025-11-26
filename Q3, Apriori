@@ -1,0 +1,114 @@
+"mam given this code " 
+
+# Install required library
+!pip install mlxtend pandas
+import pandas as pd
+from mlxtend.frequent_patterns import apriori, association_rules
+dataset = [
+['milk', 'bread', 'nuts', 'apple'],
+['milk', 'bread', 'apple'],
+['milk', 'bread'],
+['milk', 'bread', 'apple'],
+['milk', 'bread', 'nuts']
+]
+
+from mlxtend.preprocessing import TransactionEncoder
+te = TransactionEncoder()
+te_ary = te.fit(dataset).transform(dataset)
+df = pd.DataFrame(te_ary, columns=te.columns_)
+
+print("Sample Transaction Data:")
+print(df.head())
+
+# -----------------------------
+# Step 1: Find frequent itemsets
+# -----------------------------
+frequent_itemsets = apriori(df, min_support=0.6, use_colnames=True)
+print("\nFrequent Itemsets:")
+print(frequent_itemsets)
+
+# -----------------------------
+# Step 2: Generate association rules
+# -----------------------------
+rules = association_rules(frequent_itemsets, metric="confidence", min_threshold=0.7)
+print("\nAssociation Rules:")
+print(rules[['antecedents', 'consequents', 'support', 'confidence', 'lift']])
+
+"my code " 
+# --------------------------------------------
+# Q3 — APRIORI FOR YOUR SUPERSTORE DATASET
+# --------------------------------------------
+
+import pandas as pd
+import numpy as np
+from mlxtend.frequent_patterns import apriori, association_rules
+
+# --------------------------------------------------------
+# 1. Load your dataset (replace file name if different)
+# --------------------------------------------------------
+df = pd.read_csv("Supermart Grocery Sales - Retail Analytics Dataset.csv")
+
+# --------------------------------------------------------
+# 2. Create bins for Sales, Discount, Profit
+# --------------------------------------------------------
+df['Sales_bin'] = pd.cut(df['Sales'], bins=10)
+df['Discount_bin'] = pd.cut(df['Discount'], bins=10)
+df['Profit_bin'] = pd.cut(df['Profit'], bins=10)
+
+# --------------------------------------------------------
+# 3. Convert each order into a basket of items
+# --------------------------------------------------------
+basket_rows = []
+
+for index, row in df.iterrows():
+    items = [
+        "Customer_" + row["Customer Name"],
+        "Category_" + row["Category"],
+        "SubCategory_" + row["Sub Category"],
+        "City_" + row["City"],
+        "Region_" + row["Region"],
+        "Sales_" + str(row["Sales_bin"]),
+        "Discount_" + str(row["Discount_bin"]),
+        "Profit_" + str(row["Profit_bin"]),
+    ]
+
+    for item in items:
+        basket_rows.append([row["Order ID"], item])
+
+basket_df = pd.DataFrame(basket_rows, columns=["OrderID", "Item"])
+
+# --------------------------------------------------------
+# 4. Convert to One-Hot Matrix
+# --------------------------------------------------------
+basket = basket_df.pivot_table(
+    index='OrderID',
+    columns='Item',
+    aggfunc=lambda x: 1,
+    fill_value=0
+)
+
+# The following line is removed as it causes IndexError: Too many levels
+# basket.columns = basket.columns.get_level_values(1)
+
+# --------------------------------------------------------
+# Function: Run Apriori + Save Results
+# --------------------------------------------------------
+def run_apriori(data, minsup, minconf, label):
+    freq = apriori(data, min_support=minsup, use_colnames=True)
+    rules = association_rules(freq, metric="confidence", min_threshold=minconf)
+
+    freq.to_csv(f"frequent_items_{label}.csv", index=False)
+    rules.to_csv(f"association_rules_{label}.csv", index=False)
+
+    print(f"\nSaved: frequent_items_{label}.csv")
+    print(f"Saved: association_rules_{label}.csv")
+
+# --------------------------------------------------------
+# 5. Case A: Support 1%, Confidence 75%
+# --------------------------------------------------------
+run_apriori(basket, minsup=0.01, minconf=0.75, label="A")
+
+# --------------------------------------------------------
+# 6. Case B: Support 2%, Confidence 60%
+# --------------------------------------------------------
+run_apriori(basket, minsup=0.02, minconf=0.60, label="B")
