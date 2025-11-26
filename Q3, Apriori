@@ -5,7 +5,10 @@
 
 # Install library (Colab only)
 # !pip install mlxtend pandas
-
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="jupyter_client.session")
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings("ignore")
 import pandas as pd
 from mlxtend.preprocessing import TransactionEncoder
 from mlxtend.frequent_patterns import apriori, association_rules
@@ -53,12 +56,14 @@ rules_b = association_rules(freq_b, metric="confidence", min_threshold=0.60)
 print("\nAssociation Rules (Case B):")
 print(rules_b[['antecedents', 'consequents', 'support', 'confidence', 'lift']])
 
-
 "my code " 
 # --------------------------------------------
 # Q3 — APRIORI FOR YOUR SUPERSTORE DATASET
 # --------------------------------------------
-
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="jupyter_client.session")
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings("ignore")
 import pandas as pd
 import numpy as np
 from mlxtend.frequent_patterns import apriori, association_rules
