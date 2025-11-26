@@ -1,38 +1,58 @@
-"mam given this code " 
+"mam gave this code " 
+# -------------------------------------------
+# APRIORI FOR THE GIVEN DATASET (T1 to T5)
+# -------------------------------------------
 
-# Install required library
-!pip install mlxtend pandas
+# Install library (Colab only)
+# !pip install mlxtend pandas
+
 import pandas as pd
+from mlxtend.preprocessing import TransactionEncoder
 from mlxtend.frequent_patterns import apriori, association_rules
+
+# Given dataset
 dataset = [
-['milk', 'bread', 'nuts', 'apple'],
-['milk', 'bread', 'apple'],
-['milk', 'bread'],
-['milk', 'bread', 'apple'],
-['milk', 'bread', 'nuts']
+    ['milk', 'bread', 'nuts', 'apple'],   # T1
+    ['milk', 'bread', 'apple'],           # T2
+    ['milk', 'bread'],                    # T3
+    ['milk', 'bread', 'apple'],           # T4
+    ['milk', 'bread', 'nuts']             # T5
 ]
 
-from mlxtend.preprocessing import TransactionEncoder
+# Convert to one-hot encoded DataFrame
 te = TransactionEncoder()
 te_ary = te.fit(dataset).transform(dataset)
 df = pd.DataFrame(te_ary, columns=te.columns_)
 
-print("Sample Transaction Data:")
-print(df.head())
+print("Transaction Dataset:")
+print(df)
 
-# -----------------------------
-# Step 1: Find frequent itemsets
-# -----------------------------
-frequent_itemsets = apriori(df, min_support=0.6, use_colnames=True)
-print("\nFrequent Itemsets:")
-print(frequent_itemsets)
+# -------------------------------------------
+# CASE (a): min support = 50%, confidence = 75%
+# -------------------------------------------
+print("\n=== CASE (a): Support = 0.50, Confidence = 0.75 ===")
 
-# -----------------------------
-# Step 2: Generate association rules
-# -----------------------------
-rules = association_rules(frequent_itemsets, metric="confidence", min_threshold=0.7)
-print("\nAssociation Rules:")
-print(rules[['antecedents', 'consequents', 'support', 'confidence', 'lift']])
+freq_a = apriori(df, min_support=0.50, use_colnames=True)
+print("\nFrequent Itemsets (Case A):")
+print(freq_a)
+
+rules_a = association_rules(freq_a, metric="confidence", min_threshold=0.75)
+print("\nAssociation Rules (Case A):")
+print(rules_a[['antecedents', 'consequents', 'support', 'confidence', 'lift']])
+
+# -------------------------------------------
+# CASE (b): min support = 60%, confidence = 60%
+# -------------------------------------------
+print("\n=== CASE (b): Support = 0.60, Confidence = 0.60 ===")
+
+freq_b = apriori(df, min_support=0.60, use_colnames=True)
+print("\nFrequent Itemsets (Case B):")
+print(freq_b)
+
+rules_b = association_rules(freq_b, metric="confidence", min_threshold=0.60)
+print("\nAssociation Rules (Case B):")
+print(rules_b[['antecedents', 'consequents', 'support', 'confidence', 'lift']])
+
 
 "my code " 
 # --------------------------------------------
